@@ -1,5 +1,8 @@
 
 
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
@@ -51,6 +54,26 @@ public class Main {
                 if(table.equals(""))
                     continue;
                 String mainCopyIP = ServerSession.getMainCopy(table);
+
+                String filePath = "D:/" + table + "Log.txt";
+                FileInputStream fileInputStream = new FileInputStream(filePath);
+                BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(fileInputStream));
+
+                String content = null;
+                long time = 0L;
+
+                //读到需要的时间戳为止
+                while (true) {
+                    content = bufferedReader.readLine();
+
+                    //找不到大于时间戳的时间，或者日志信息为空
+                    if(content == null){
+                        break;
+                    }
+                    time = Long.parseLong(bufferedReader.readLine());
+                }
+                MyNodeInfo.setNewestTimeStamp(time);
+
                 if(!mainCopyIP.equals(MyNodeInfo.getIPAddr())){
                     ArrayList<SQLTimePair> ops = RmiClient.dataSyncRequest(table,MyNodeInfo.getNewestTimeStamp(),table);
                     for(int i = 0; i<ops.size();i++){
@@ -96,7 +119,7 @@ public class Main {
 //            String queryResult ;
 ////            queryResult= Connector.connectDB("CREATE TABLE testTable(id int);");
 ////            queryResult= Connector.connectDB();
-////            queryResult= Connector.connectDB("insert into testTable values(1);");
+////            queryResult= Connector.connectDB("insert into testTable val192.168.137.219ues(1);");
 //            RmiClient.rmiCall(" CREATE TABLE Test1(id int);","localhost", 1, 0L, "Test1");
 ////            System.out.println(queryResult);
 //

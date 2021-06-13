@@ -198,11 +198,12 @@ public class RmiMethods extends UnicastRemoteObject implements RmiInterfaces{
 
         //锁住
 //        lock.writeLock().lock();
+        System.out.println("开始同步");
         ArrayList<SQLTimePair> tableRec=new ArrayList<>();
         //读文件
         try{
             //打开文件
-            String filePath = "/" + tableName + "Log.txt";
+            String filePath = "D:/" + tableName + "Log.txt";
             FileInputStream fileInputStream = new FileInputStream(filePath);
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(fileInputStream));
 
@@ -216,9 +217,10 @@ public class RmiMethods extends UnicastRemoteObject implements RmiInterfaces{
                 //找不到大于时间戳的时间，或者日志信息为空
                 if(content == null){
                     tableRec.add(new SQLTimePair(0L,null));
-                    continue;
+                    break;
                 }
-                time = (long) Integer.parseInt(bufferedReader.readLine());
+                String content2 = bufferedReader.readLine();
+                time = (long) Long.parseLong(content2);
 
                 //获取到了第一个大于时间戳的时间
                 if(time > timeStamp){
@@ -230,15 +232,14 @@ public class RmiMethods extends UnicastRemoteObject implements RmiInterfaces{
 
             while (true){
 
-                tableRec.add(new SQLTimePair(time,content));
-
                 content = bufferedReader.readLine();
 
                 //完成一个表的导入
                 if(content == null){
                     break;
                 }
-                time = (long) Integer.parseInt(bufferedReader.readLine());
+                time = Long.parseLong(bufferedReader.readLine());
+                tableRec.add(new SQLTimePair(time,content));
             }
 
         }
