@@ -1,5 +1,6 @@
+import java.io.Serializable;
 
-public class SQLTimePair {
+public class SQLTimePair implements Serializable {
     public Long timeStamp;
     public String clause;
 

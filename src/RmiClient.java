@@ -14,7 +14,7 @@ public class RmiClient {
         // 否则，URL就是：rmi://RMIService_IP:1099/hello
         Registry registry = null;
         try {
-            registry = LocateRegistry.getRegistry("localhost");
+            registry = LocateRegistry.getRegistry(IPAddr);
         } catch (RemoteException e) {
             e.printStackTrace();
         }
@@ -44,7 +44,7 @@ public class RmiClient {
         System.out.println("开始同步");
         Registry registry = null;
         try {
-            registry = LocateRegistry.getRegistry("192.168.137.178");
+            registry = LocateRegistry.getRegistry(IPAddr);
         } catch (RemoteException e) {
             e.printStackTrace();
         }

@@ -229,7 +229,8 @@ public class RmiMethods extends UnicastRemoteObject implements RmiInterfaces{
             }
 
             //一张表的日志
-
+            if(time > timeStamp)
+                tableRec.add(new SQLTimePair(time,content));
             while (true){
 
                 content = bufferedReader.readLine();
@@ -245,7 +246,7 @@ public class RmiMethods extends UnicastRemoteObject implements RmiInterfaces{
         }
             catch(Exception e){
                 tableRec = new ArrayList<>();
-                tableRec.add(new SQLTimePair(0L,null));
+//                tableRec.add(new SQLTimePair(0L,null));
                 System.out.println("读日志错误");
 //                lock.writeLock().unlock();
             }

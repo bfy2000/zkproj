@@ -169,8 +169,8 @@ public class ServerSession implements Watcher{
                 }
 
                 //遍历表
-                List<String> tableList = zk.getChildren("/DBRoot/"+node,null);
-                for(String table : tableList){
+                String tableList = new String(zk.getData("/DBRoot/"+node,false,versionMap.get("/DBRoot/"+node)));
+                for(String table : tableList.split(",")){
                     if(table.equals(tableName)){
                         slaveNodes.add(nodeIP);
                         break;

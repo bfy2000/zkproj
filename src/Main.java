@@ -75,10 +75,12 @@ public class Main {
                 MyNodeInfo.setNewestTimeStamp(time);
 
                 if(!mainCopyIP.equals(MyNodeInfo.getIPAddr())){
-                    ArrayList<SQLTimePair> ops = RmiClient.dataSyncRequest(table,MyNodeInfo.getNewestTimeStamp(),table);
+                    ArrayList<SQLTimePair> ops = RmiClient.dataSyncRequest(mainCopyIP,MyNodeInfo.getNewestTimeStamp(),table);
                     for(int i = 0; i<ops.size();i++){
                         int opType = 1;
-
+                        if(ops.get(i).clause == null) {
+                            continue;
+                        }
                         if (ops.get(i).clause.split(" ")[1].equals("table".toUpperCase())){
                             if (ops.get(i).clause.split(" ")[0].equals("create".toUpperCase())){
                                 opType = 2;
