@@ -18,9 +18,11 @@ public class ServerSession implements Watcher{
 
     private static ZooKeeper zk;
     private static Map<String,Stat> versionMap;
+   // private static CountDownLatch countDownLatch = new CountDownLatch(1);
 
     static {
         try {
+            //countDownLatch = new CountDownLatch(1);
             versionMap = new HashMap<String,Stat>();
             String serverIP = MyNodeInfo.getServerIP();
             zk = new ZooKeeper(serverIP, 5000, new Watcher(){
@@ -30,6 +32,7 @@ public class ServerSession implements Watcher{
                         //首次连接成功
                         if (EventType.None == event.getType() && null == event.getPath()) {
                             System.out.println("Connect Zookeeper Server Success");
+                            //countDownLatch.countDown();
                         }
                     }
                 }
@@ -38,6 +41,11 @@ public class ServerSession implements Watcher{
             e.printStackTrace();
         }
         //连接成功
+//        try {
+//            countDownLatch.await();
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
         System.out.println(zk.getState());
     }
 
@@ -150,7 +158,11 @@ public class ServerSession implements Watcher{
     }
 
     public static Boolean isMainCopy(String tableName)throws Exception{
-        String mainCopyIP = new String(zk.getData("/MainCopy/"+tableName, false, null));
+        String path = "/MainCopy/"+tableName;
+        if(!versionMap.containsKey(path)){
+            versionMap.put(path,new Stat());
+        }
+        String mainCopyIP = new String(zk.getData(path, false, versionMap.get(path)));
         return mainCopyIP.equals(MyNodeInfo.getIPAddr());
     }
 
@@ -158,18 +170,25 @@ public class ServerSession implements Watcher{
 
         String IPAddr = MyNodeInfo.getIPAddr();
         ArrayList<String> slaveNodes = new ArrayList<>();
+
         try {
             List<String> nodeList = zk.getChildren("/DBRoot",null);
             //遍历node
             for(String node : nodeList){
                 //是不是自己
-                String nodeIP = new String(zk.getData("/DBRoot/"+node,false,null));
+
+                String path = "/DBRoot/"+node;
+                if(!versionMap.containsKey(path)){
+                    versionMap.put(path,new Stat());
+                }
+
+                String nodeIP = node;
                 if (nodeIP.equals(IPAddr)){
                     continue;
                 }
 
                 //遍历表
-                String tableList = new String(zk.getData("/DBRoot/"+node,false,versionMap.get("/DBRoot/"+node)));
+                String tableList = new String(zk.getData(path,false,versionMap.get("/DBRoot/"+node)));
                 for(String table : tableList.split(",")){
                     if(table.equals(tableName)){
                         slaveNodes.add(nodeIP);
@@ -185,7 +204,12 @@ public class ServerSession implements Watcher{
     }
 
     public static String getMainCopy (String tableName)throws Exception{
-        return new String(zk.getData("/MainCopy/" + tableName,false, null));
+        String path = "/MainCopy/" + tableName;
+//        if(!versionMap.containsKey(path)){
+//            versionMap.put(path,new Stat());
+//        }
+        String res = new String(zk.getData(path,false, null/*versionMap.get(path)*/));
+        return res;
     }
 
     public static void deleteTable(){

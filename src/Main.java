@@ -81,11 +81,11 @@ public class Main {
                         if(ops.get(i).clause == null) {
                             continue;
                         }
-                        if (ops.get(i).clause.split(" ")[1].equals("table".toUpperCase())){
-                            if (ops.get(i).clause.split(" ")[0].equals("create".toUpperCase())){
+                        if (ops.get(i).clause.split(" ")[2].equals("table".toLowerCase())){
+                            if (ops.get(i).clause.split(" ")[1].equals("create".toLowerCase())){
                                 opType = 2;
                             }
-                            else if (ops.get(i).clause.split(" ")[0].equals("drop".toUpperCase())){
+                            else if (ops.get(i).clause.split(" ")[1].equals("drop".toLowerCase())){
                                 opType = 3;
                             }
                         }
@@ -122,7 +122,7 @@ public class Main {
 ////            queryResult= Connector.connectDB("CREATE TABLE testTable(id int);");
 ////            queryResult= Connector.connectDB();
 ////            queryResult= Connector.connectDB("insert into testTable val192.168.137.219ues(1);");
-//            RmiClient.rmiCall(" CREATE TABLE Test1(id int);","localhost", 1, 0L, "Test1");
+//            RmiClient.rmiCall(" select * from usb;","localhost", 0, 0L, "usb");
 ////            System.out.println(queryResult);
 //
 //        } catch (Exception e) {

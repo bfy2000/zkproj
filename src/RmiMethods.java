@@ -15,7 +15,7 @@ public class RmiMethods extends UnicastRemoteObject implements RmiInterfaces{
     }
     //语句、目标地址、操作类型0读1写2建表3删除表
     @Override
-    public String callSQL(String clause, int opType, long timeStamp, String tableName) throws RemoteException {
+    public String callSQL(String clause, String IPAddr, int opType, long timeStamp, String tableName) throws RemoteException {
 
         String queryResult = "initial";
 
@@ -129,7 +129,7 @@ public class RmiMethods extends UnicastRemoteObject implements RmiInterfaces{
                 }
                 //第一个字符是0，执行失败
                 else{
-                    lock.readLock().unlock();
+                    lock.writeLock().unlock();
                     return queryResult.substring(1);
                 }
             }
@@ -159,7 +159,7 @@ public class RmiMethods extends UnicastRemoteObject implements RmiInterfaces{
                 }
 
                 FileWriter fw = new FileWriter(filePath, true);
-                fw.write(content);
+                fw.write(content.toLowerCase());
                 fw.write(timeStr);
 //                FileOutputStream fileOutputStream = new FileOutputStream(file);
 //                fileOutputStream.write(content);
