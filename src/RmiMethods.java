@@ -8,21 +8,21 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 public class RmiMethods extends UnicastRemoteObject implements RmiInterfaces{
 
-//    private static final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
+    private static final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
 
     protected RmiMethods() throws RemoteException {
 
     }
     //语句、目标地址、操作类型0读1写2建表3删除表
     @Override
-    public String callSQL(String clause, String IPAddr, int opType, long timeStamp, String tableName) throws RemoteException {
+    public String callSQL(String clause, int opType, long timeStamp, String tableName) throws RemoteException {
 
         String queryResult = "initial";
 
         System.out.println(1);
         //读
         if (opType == 0){
-//            lock.readLock().lock();
+            lock.readLock().lock();
 
             try {
                 System.out.println(5);
@@ -36,11 +36,11 @@ public class RmiMethods extends UnicastRemoteObject implements RmiInterfaces{
                 e.printStackTrace();
                 System.out.println("数据库查询失败");
             }
-//            lock.readLock().unlock();
+            lock.readLock().unlock();
         }
         //写
         else {
-//            lock.writeLock().lock();
+            lock.writeLock().lock();
 
             //先自己执行
             try {
@@ -88,7 +88,7 @@ public class RmiMethods extends UnicastRemoteObject implements RmiInterfaces{
                 }
                 //第一个字符是0，执行失败
                 else{
-//                    lock.readLock().unlock();
+                    lock.writeLock().unlock();
                     return queryResult.substring(1);
                 }
 
@@ -129,7 +129,7 @@ public class RmiMethods extends UnicastRemoteObject implements RmiInterfaces{
                 }
                 //第一个字符是0，执行失败
                 else{
-//                    lock.readLock().unlock();
+                    lock.readLock().unlock();
                     return queryResult.substring(1);
                 }
             }
@@ -172,7 +172,7 @@ public class RmiMethods extends UnicastRemoteObject implements RmiInterfaces{
             }
             catch(Exception e){
                 System.out.println("写日志错误");
-//                lock.writeLock().unlock();
+                lock.writeLock().unlock();
                 return queryResult.substring(1);
             }
 
@@ -183,7 +183,7 @@ public class RmiMethods extends UnicastRemoteObject implements RmiInterfaces{
 
             System.out.println(7);
             //解锁
-//            lock.writeLock().unlock();
+            lock.writeLock().unlock();
             System.out.println(8);
 
         }
@@ -197,7 +197,7 @@ public class RmiMethods extends UnicastRemoteObject implements RmiInterfaces{
     public ArrayList<SQLTimePair> handleDataSync(String IPAddr, long timeStamp, String tableName) throws RemoteException {
 
         //锁住
-//        lock.writeLock().lock();
+        lock.writeLock().lock();
         System.out.println("开始同步");
         ArrayList<SQLTimePair> tableRec=new ArrayList<>();
         //读文件
@@ -242,14 +242,16 @@ public class RmiMethods extends UnicastRemoteObject implements RmiInterfaces{
                 time = Long.parseLong(bufferedReader.readLine());
                 tableRec.add(new SQLTimePair(time,content));
             }
+            lock.writeLock().unlock();
 
         }
-            catch(Exception e){
-                tableRec = new ArrayList<>();
-//                tableRec.add(new SQLTimePair(0L,null));
-                System.out.println("读日志错误");
-//                lock.writeLock().unlock();
-            }
+        catch(Exception e){
+            tableRec = new ArrayList<>();
+//            tableRec.add(new SQLTimePair(0L,null));
+            System.out.println("读日志错误");
+            lock.writeLock().unlock();
+        }
+
 
         return tableRec;
 

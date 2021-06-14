@@ -30,7 +30,7 @@ public class RmiClient {
         // 调用远程对象的方法
         String x = null;
         try {
-            x = remoteQuery.callSQL(clause, IPAddr, opType, timeStamp, tableName);
+            x = remoteQuery.callSQL(clause, opType, timeStamp, tableName);
         } catch (RemoteException e) {
             e.printStackTrace();
         }
